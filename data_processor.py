@@ -10,6 +10,12 @@ class DataProcessor:
             creates an output folder if it does not exist.
             Args:
                 folder_name (str): The name of the folder to create. Default is 'output'.
+        unique_check(list_of_dicts):
+            Removes duplicate dictionaries from a list.
+            Args:
+                list_of_dicts (list): A list of dictionaries.
+            Returns:
+                list: A list of unique dictionaries
         generate_xml(items, filename='output/steam_items.xml'):
             Generates an XML file from a list of items.
             Args:
@@ -25,6 +31,11 @@ class DataProcessor:
         if not os.path.exists(folder_name):
             os.makedirs(folder_name)
             print(f"Folder '{folder_name}' created.")
+
+
+    @staticmethod
+    def unique_check(list_of_dicts):
+        return list({d['name']: d for d in list_of_dicts}.values())
 
 
     @staticmethod

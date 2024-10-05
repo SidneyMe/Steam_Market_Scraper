@@ -74,7 +74,7 @@ class ScraperManager:
 
     def run(self):
         print("Starting run method")
-        item_list = self.parse()
+        item_list = DataProcessor.unique_check(self.parse())
         print(f"Parsed {len(item_list)} items")
         self.data_processor.create_output_folder()
 
