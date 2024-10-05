@@ -67,7 +67,7 @@ class FullSteamScrape(Scraper):
 
 
     def scrape(self):
-        for i in range(0, 100, 100):
+        for i in range(0, 2100, 100):
             print(f'Working with page {i+1}')
             results = self.page_loader(i)
             for item in results:
