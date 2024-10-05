@@ -1,3 +1,4 @@
+import os
 from lxml import etree
 import pandas as pd
 
@@ -5,6 +6,10 @@ class DataProcessor:
     """
     DataProcessor class provides static methods to generate XML and Excel files from a list of items.
     Methods:
+        create_output_folder(folder_name='output'):
+            creates an output folder if it does not exist.
+            Args:
+                folder_name (str): The name of the folder to create. Default is 'output'.
         generate_xml(items, filename='output/steam_items.xml'):
             Generates an XML file from a list of items.
             Args:
@@ -16,6 +21,10 @@ class DataProcessor:
                 items (list): A list of dictionaries where each dictionary represents an item.
                 filename (str): The output file path for the Excel file. Default is 'output/steam_items_table.xlsx'.
     """
+    def create_output_folder(self, folder_name='output'):
+        if not os.path.exists(folder_name):
+            os.makedirs(folder_name)
+            print(f"Folder '{folder_name}' created.")
 
 
     @staticmethod

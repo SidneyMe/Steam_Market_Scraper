@@ -39,6 +39,7 @@ class ScraperManager:
     def __init__(self, steam_urls):
         self.steam_urls = steam_urls
         self.web_driver = WebDriver()
+        self.data_processor = DataProcessor()
         self.steam_scraper = SteamScraper(self.web_driver)
         self.steam_full_scraper = FullSteamScrape(self.web_driver)
         self.folio_scraper = FolioScraper(self.web_driver)
@@ -75,12 +76,13 @@ class ScraperManager:
         print("Starting run method")
         item_list = self.parse()
         print(f"Parsed {len(item_list)} items")
-        
+        self.data_processor.create_output_folder()
+
         print("Generating XML")
         DataProcessor.generate_xml(item_list)
         print("Generating Excel")
         DataProcessor.generate_excel(item_list)
-        
+
         print("Creating SQLite database")
         sqlite_creator = SQLiteDatabaseCreator(item_list)
         sqlite_creator.create_db()
