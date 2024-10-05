@@ -67,8 +67,9 @@ class FullSteamScrape(Scraper):
 
 
     def scrape(self):
-        for i in range(0, 2100, 100):
-            print(f'Working with page {i+1}')
+        num_pages = self.get_json()['total_count']
+        for i in range(0, num_pages, 100):
+            print(f'Working with page {(i+1)//100}')
             results = self.page_loader(i)
             for item in results:
                 self.items_list.append(self.extract_items_info(item))
