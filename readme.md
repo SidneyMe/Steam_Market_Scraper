@@ -24,7 +24,7 @@ The Steam Market Scraper is a Python-based tool designed to scrape data from the
 ## Usage
 1. Ensure you have the ChromeDriver executable in the `chromedriver/` directory.
 
-2. Provide *urls* list in main.py with CS2  url/urls to if you want to scrape particular items. If the list stays empty, all steam items will be parsed.
+2. Provide the *urls* list in main.py with CS2 url/urls to scrape particular items. If the list stays empty, all CS2 items will be parsed.
 
 3. Run the scraper:
     ```sh
