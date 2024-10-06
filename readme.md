@@ -37,10 +37,7 @@ The Steam Market Scraper is a Python-based tool designed to scrape data from the
 
 ```plaintext
 Steam_Market_Scraper/
- ├── chromedriver/
- │   ├── chromedriver.exe
- │   ├── LICENSE.chromedriver
- │   └── THIRD_PARTY_NOTICES.chromedriver
+ ├── chromedriver
  ├── db_creators/
  │   ├── __init__.py
  │   └── sqlite_creator.py
@@ -50,11 +47,6 @@ Steam_Market_Scraper/
  │   ├── folio_scraper.py
  │   ├── full_steam_scraper.py
  │   └── steam_scraper.py
- ├── output/
- │   ├── steam_items_table.xlsx
- │   └── steam_items.xml
- ├── __pycache__/
- ├── venv/
  ├── data_processor.py
  ├── main.py
  ├── readme.md
