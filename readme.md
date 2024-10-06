@@ -3,6 +3,8 @@
 ## Overview
 The Steam Market Scraper is a Python-based tool designed to scrape data from the Steam Community Market and Steam Folio websites. It collects item information, processes the data, and stores it in various formats including XML, Excel, and an SQLite database.
 
+### Important note: the full scrape takes 5 hours 😊
+
 ## Installation
 1. Clone the repository:
     ```sh
