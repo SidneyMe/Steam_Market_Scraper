@@ -7,16 +7,9 @@ from lxml import etree
 
 class WebDriver:
     """
-    A class to manage a headless Chrome WebDriver instance.
-    Methods
-    -------
-    __init__():
-        Initializes the WebDriver with headless Chrome options.
-    get_page(url, delay=1):
-        Loads a web page and returns its HTML content as an lxml etree object.
-    close():
-        Closes the WebDriver instance.
+    Manages the Chrome WebDriver.
     """
+
     def __init__(self):
         chrome_options = Options()
         chrome_options.add_argument('--headless')
@@ -30,7 +23,9 @@ class WebDriver:
             print(f"Error initializing WebDriver: {e}")
             raise
 
-    def get_page(self, url, delay=1):
+    def get_page(self, url: str, delay: int = 1) -> etree._Element:
+        """Loads a web page and returns its HTML content"""
+
         try:
             self.driver.get(url)
             time.sleep(delay)

@@ -5,41 +5,28 @@ import pandas as pd
 class DataProcessor:
     """
     DataProcessor class provides static methods to generate XML and Excel files from a list of items.
-    Methods:
-        create_output_folder(folder_name='output'):
-            creates an output folder if it does not exist.
-            Args:
-                folder_name (str): The name of the folder to create. Default is 'output'.
-        unique_check(list_of_dicts):
-            Removes duplicate dictionaries from a list.
-            Args:
-                list_of_dicts (list): A list of dictionaries.
-            Returns:
-                list: A list of unique dictionaries
-        generate_xml(items, filename='output/steam_items.xml'):
-            Generates an XML file from a list of items.
-            Args:
-                items (list): A list of dictionaries where each dictionary represents an item.
-                filename (str): The output file path for the XML file. Default is 'output/steam_items.xml'.
-        generate_excel(items, filename='output/steam_items_table.xlsx'):
-            Generates an Excel file from a list of items.
-            Args:
-                items (list): A list of dictionaries where each dictionary represents an item.
-                filename (str): The output file path for the Excel file. Default is 'output/steam_items_table.xlsx'.
     """
-    def create_output_folder(self, folder_name='output'):
+
+    @staticmethod
+    def create_output_folder(folder_name: str ='output'):
+        """Creates an output folder if it does not exist."""
+
         if not os.path.exists(folder_name):
             os.makedirs(folder_name)
             print(f"Folder '{folder_name}' created.")
 
 
     @staticmethod
-    def unique_check(list_of_dicts):
+    def unique_check(list_of_dicts: list[dict]) -> list[dict]:
+        """Removes duplicate dictionaries from a list."""
+
         return list({d['name']: d for d in list_of_dicts}.values())
 
 
     @staticmethod
-    def generate_xml(items, filename='output/steam_items.xml'):
+    def generate_xml(items: list[dict], filename: str ='output/steam_items.xml'):
+        """Generates an XML file from a list of items."""
+
         root = etree.Element('Items')
         for item in items:
             item_element = etree.SubElement(root, 'Item')
@@ -52,7 +39,9 @@ class DataProcessor:
 
 
     @staticmethod
-    def generate_excel(items, filename='output/steam_items_table.xlsx'):
+    def generate_excel(items: list[dict], filename: str ='output/steam_items_table.xlsx'):
+        """Generates an Excel file from a list of items."""
+
         df = pd.DataFrame(items)
         df.to_excel(filename, index=False)
         print('Excel has been generated')
