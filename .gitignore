@@ -1,5 +1,5 @@
 __pycache__/
 venv
 .env
-experiments
-output
+experiments.py
+.pylintrc
