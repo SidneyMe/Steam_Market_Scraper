@@ -1,6 +1,6 @@
 from scraper_manager import ScraperManager
 
 if __name__ == '__main__':
-    urls = []    
+    urls = []
     scraper_manager = ScraperManager(urls)
     scraper_manager.run()

@@ -25,11 +25,11 @@ class ScraperManager:
     Managing the scraping process from multiple sources and processing the scraped data.
     """
 
-    def __init__(self, steam_urls: list):
+    def __init__(self, steam_urls: list[str]):
         self.steam_urls = steam_urls
         self.web_driver = WebDriver()
         self.data_processor = DataProcessor()
-        self.steam_scraper = SteamScraper(self.web_driver)
+        self.steam_scraper = SteamScraper(self.web_driver, steam_urls)
         self.steam_full_scraper = FullSteamScrape(self.web_driver)
         self.folio_scraper = FolioScraper(self.web_driver)
 
@@ -40,13 +40,11 @@ class ScraperManager:
         try:
             if self.steam_urls:
                 for url in self.steam_urls:
-                    self.steam_scraper.scrape(url)
-                    item_list = self.steam_scraper.items_list
+                    steam_items = self.steam_scraper.scrape()
             else:
-                self.steam_full_scraper.scrape()
-                item_list = self.steam_full_scraper.items_list
+                steam_items = self.steam_full_scraper.scrape()
             with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
-                folio_urls = [item['url'].replace('https://steamcommunity.com/market/listings/730/', 'https://steamfolio.com/Item?name=') for item in item_list]
+                folio_urls = self.folio_scraper.get_folio_urls(steam_items)
                 future_to_url = {executor.submit(self.folio_scraper.scrape, url): url for url in folio_urls}
                 for future in concurrent.futures.as_completed(future_to_url):
                     url = future_to_url[future]
@@ -56,13 +54,13 @@ class ScraperManager:
                         print(f'{url} generated an exception: {exc}')
                     else:
                         index = folio_urls.index(url)
-                        item_list[index].update(data)
-            item_list = self.re_parse_nones(item_list)
+                        steam_items[index].update(data)
+            steam_items = self.re_parse_nones(steam_items)
         except Exception:
-            self.output_gen(item_list)
+            self.output_gen(steam_items)
         finally:
             self.web_driver.close()
-        return item_list
+        return steam_items
 
     def re_parse_nones(self, steam_items: list[dict]) -> list[dict]:
         """Re-parses items with missing sales data by scraping again from Folio"""

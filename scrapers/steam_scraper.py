@@ -1,7 +1,7 @@
 import time
-from web_driver import WebDriver
 from scrapers.base_scraper import Scraper
 from lxml import etree
+from web_driver import WebDriver
 
 
 class SteamScraper(Scraper):
@@ -9,9 +9,9 @@ class SteamScraper(Scraper):
     Scrapes data from the Steam marketplace.
     """
 
-    def __init__(self, web_driver: WebDriver):
+    def __init__(self, web_driver: WebDriver, urls: list[str]):
         super().__init__(web_driver)
-        self.items_list = []
+        self.urls = urls
 
 
     def get_num_pages(self, url: str) -> int:
@@ -45,16 +45,19 @@ class SteamScraper(Scraper):
             else:
                 return page
 
-    def scrape(self, url: str):
+    def scrape(self) -> list[dict]:
         """Scrapes the Steam marketplace for items, iterating through all pages."""
-
-        steam_page_count = self.get_num_pages(url)
-        base_url = url.split('#')[0]
-        for current_page in range(1, steam_page_count):
-            current_url = f'{base_url}#p{current_page}_price_asc'
-            page = self.steam_page_loader(current_url)
-            for market_listing in page.xpath('//*[@id="searchResultsRows"]/a[contains(@class, "market_listing_row")]'):
-                self.items_list.append(self.extract_item_info(market_listing))
+        
+        steam_lots = []
+        for url in self.urls:
+            steam_page_count = self.get_num_pages(url)
+            base_url = url.split('#')[0]
+            for current_page in range(1, steam_page_count):
+                current_url = f'{base_url}#p{current_page}_price_asc'
+                page = self.steam_page_loader(current_url)
+                for market_listing in page.xpath('//*[@id="searchResultsRows"]/a[contains(@class, "market_listing_row")]'):
+                    steam_lots.append(self.extract_item_info(market_listing))
+            return steam_lots
 
     def extract_item_info(self, market_listing: etree._Element) -> dict:
         return {

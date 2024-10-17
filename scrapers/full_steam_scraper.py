@@ -11,7 +11,6 @@ class FullSteamScrape(Scraper):
 
     def __init__(self, web_driver: WebDriver):
         super().__init__(web_driver)
-        self.items_list: list = []
         self.url = 'https://steamcommunity.com/market/search/render/?appid=730&norender=1'
         self.max_retries: int = 5
         self.retry_delay: int = 5
@@ -44,7 +43,8 @@ class FullSteamScrape(Scraper):
                     print("Max retries reached. Skipping this page.")
                     return None
 
-    def scrape(self):
+    def scrape(self) -> list[dict]:
+        steam_lots = []
         try:
             num_pages = self.get_json()['total_count']
         except(KeyError, json.JSONDecodeError):
@@ -55,7 +55,8 @@ class FullSteamScrape(Scraper):
             if results is None:
                 continue
             for item in results:
-                self.items_list.append(self.extract_items_info(item))
+                steam_lots.append(self.extract_items_info(item))
+        return steam_lots
 
     def encode_url(self, item_name: str) -> str:
         """Encodes a name of an item to standard URL encoding"""

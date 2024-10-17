@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 from web_driver import WebDriver
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
 
 class Scraper(ABC):
     """
@@ -14,8 +16,8 @@ class Scraper(ABC):
 
     def __init__(self, web_driver: WebDriver):
         self.web_driver = web_driver
-
+        self.wait = WebDriverWait
 
     @abstractmethod
-    def scrape(self, url):
+    def scrape(self):
         pass
