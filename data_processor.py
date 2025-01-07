@@ -17,25 +17,17 @@ class DataProcessor:
 
 
     @staticmethod
-    def unique_check(list_of_dicts: list[dict]) -> list[dict]:
+    def unique_check(steam_items_df: pd.DataFrame) -> pd.DataFrame:
         """Removes duplicate dictionaries from a list."""
 
-        return list({d['name']: d for d in list_of_dicts}.values())
+        return steam_items_df.drop_duplicates(subset=['name'])
 
 
     @staticmethod
-    def generate_xml(items: list[dict], filename: str ='output/steam_items.xml'):
+    def generate_xml(steam_items_df: pd.DataFrame, filepath: str ='output/steam_items'):
         """Generates an XML file from a list of items."""
 
-        root = etree.Element('Items')
-        for item in items:
-            item_element = etree.SubElement(root, 'Item')
-            for key, value in item.items():
-                sub_element = etree.SubElement(item_element, key)
-                sub_element.text = str(value)
-        tree = etree.ElementTree(root)
-        with open(filename, 'wb') as f:
-            tree.write(f, pretty_print=True, xml_declaration=True, encoding='UTF-8')
+        steam_items_df.to_xml(path_or_buffer=filepath, encoding='UTF-8', pretty_print=True)
 
 
     @staticmethod
@@ -45,3 +37,10 @@ class DataProcessor:
         df = pd.DataFrame(items)
         df.to_excel(filename, index=False)
         print('Excel has been generated')
+
+
+    @staticmethod
+    def merge_steam_folio(steam_items: list[dict], sales_df: pd.DataFrame) -> pd.DataFrame:
+
+        steam_items_df = pd.DataFrame(steam_items)
+        return steam_items_df.merge(sales_df, how='inner', on='name')
