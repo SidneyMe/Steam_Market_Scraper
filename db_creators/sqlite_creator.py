@@ -1,4 +1,5 @@
 import sqlite3
+import pandas as pd
 from abc import ABC
 
 class SQLiteDB(ABC):
@@ -7,8 +8,8 @@ class SQLiteDB(ABC):
 
     DB_PATH = 'output/steam_items.db'
 
-    def __init__(self, items_list: list[dict]):
-        self.items_list = items_list
+    def __init__(self, steam_items_df: pd.DataFrame):
+        self.steam_items_df = steam_items_df
         self.conn = None
         self.cur = None
 
@@ -53,24 +54,12 @@ class SQLiteDatabaseCreator(SQLiteDB):
             )"""
 
     def create_db(self):
-        self.add_id()
         self.open_connection()
         try:
-            self.cur.execute(self.sql_script())
-            self.cur.execute("""INSERT INTO 
-                             steam_items(id, name, url, qty, price, sales_w, sales_m, sales_y) 
-                VALUES (:id, :name, :url, :qty, :price, :sales_w, :sales_m, :sales_y)
-                """, self.items_list)
-            self.conn.commit()
+            self.steam_items_df.to_sql(name='steam_items', con=self.conn, index=False)
+
         finally:
             self.close_connection()
-
-    def add_id(self):
-
-        """Adds an id to each item in the list"""
-
-        for i, item in enumerate(self.items_list):
-            item['id'] = i
 
 
 class SqliteMigration(SQLiteDB):
@@ -78,36 +67,15 @@ class SqliteMigration(SQLiteDB):
     """Allows to update generated db"""
 
     def make_migration(self):
-        
+
         """Updates the existing db. Overwrites old data"""
-        
+
         self.open_connection()
+
         try:
-            for item in self.items_list:
-                db_item = self.cur.execute('SELECT * FROM steam_items WHERE name = ?', (item['name'],)).fetchone() #gets an item from the db with the same name of an item
-                if not db_item:
-                    self.add_new_items(item)
-                else:
-                    db_item_dict = {
-                        'qty': db_item[3],
-                        'price': db_item[4],
-                        'sales_w': db_item[5]
-                    }
-                    if item['qty'] != db_item_dict['qty'] or item['price'] != db_item_dict['price'] or item['sales_w'] != db_item_dict['sales_w']:
-                        self.cur.execute("""UPDATE steam_items
-                                            SET qty = ?, price = ?, sales_w = ?, sales_m = ?, sales_y = ?
-                                            WHERE name = ?
-                                        """, (item['qty'], item['price'], item['sales_w'], item['sales_m'], item['sales_y'], item['name']))
+            self.steam_items_df.to_sql(name='steam_items', con=self.conn, if_exists='append', index=False)
             self.conn.commit()
+
         finally:
             self.close_connection()
-
-    def add_new_items(self, new_item: dict):
-        """Inserts a new item into the db"""
-
-        last_item = self.cur.execute('SELECT MAX(id) FROM steam_items').fetchone()[0]
-        new_item['id'] = int(last_item) + 1
-        self.cur.execute("""INSERT INTO steam_items
-                (id, name, url, qty, price, sales_w, sales_m, sales_y) 
-                VALUES (:id, :name, :url, :qty, :price, :sales_w, :sales_m, :sales_y)""", new_item)
         
