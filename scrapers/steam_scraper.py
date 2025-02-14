@@ -20,7 +20,7 @@ class SteamScraper:
                 'qty': 'market_listing_num_listings_qty',
                 'price': 'normal_price',
                 'href': 'market_listing_row_link',
-                'active_table': 'market_content_block market_home_listing_table market_home_main_listing_table market_listing_table market_listing_table_active',
+                'active_table': 'market_listing_table_active',
                 }
 
 
@@ -36,22 +36,23 @@ class SteamScraper:
         wait = self.wait(self.web_driver, 5)
 
         while True:
-            self.web_driver.get(current_url)
-            time.sleep(3)
-
             try:
-                if wait.until(EC.text_to_be_present_in_element((By.XPATH, self.LOCATORS['ban']), text_='Error')):
-                    print("You've been banned")
-                    time.sleep(300) #steam banns for 5min
+                self.web_driver.get(current_url)
+                time.sleep(13)
+                wait.until(EC.visibility_of_element_located((By.CLASS_NAME, self.LOCATORS['active_table'])))
+                return True
 
-                if not wait.until(EC.visibility_of_element_located((By.CLASS_NAME, self.LOCATORS['active_table']))):
-                    self.web_driver.refresh()
-                    time.sleep(5) 
-           
             except TimeoutException:
-                break
+                try:
+                    self.web_driver.refresh()
 
-        return True
+                    if wait.until(EC.text_to_be_present_in_element((By.XPATH, self.LOCATORS['ban']), text_='Error')):
+                        print("You've been banned")
+                        time.sleep(300) #steam banns for 5min
+                        self.web_driver.refresh()
+
+                except TimeoutException:
+                    continue
 
 
     def get_num_pages(self, url: str) -> dict[str, int]:
