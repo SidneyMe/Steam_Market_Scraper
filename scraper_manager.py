@@ -27,14 +27,19 @@ class ScraperManager:
     """
 
 
-    def __init__(self, steam_urls: list[str], driver_num: int):
+    def __init__(self, steam_urls: list[str], scrape_sales: bool, driver_num: int):
         self.steam_urls = steam_urls
+        self.scrape_sales = scrape_sales
+        
+        if not scrape_sales: # we can't use more than 1 driver on steam
+            driver_num = 1
         self.driver = WebDriver(driver_num)
         self.web_drivers = self.driver.get_webdriver(driver_num)
-        self.data_processor = DataProcessor()
-        self.steam_scraper = SteamScraper(self.web_drivers, steam_urls)
         self.steam_full_scraper = FullSteamScrape(driver_num, self.web_drivers)
         self.folio_scraper = FolioScraper(driver_num, self.web_drivers)
+        
+        self.data_processor = DataProcessor()
+        self.steam_scraper = SteamScraper(self.web_drivers, steam_urls)
 
 
     @timer
@@ -51,17 +56,21 @@ class ScraperManager:
         except Exception as e:
             print(f'An exception  {e}')
 
-        try:
-            folio_sales_df  = self.folio_scraper.scrape(steam_items, 1)
+        if self.scrape_sales:
+            try:
+                folio_sales_df  = self.folio_scraper.scrape(steam_items, delay=1)
+                return self.data_processor.merge_steam_folio(steam_items, folio_sales_df)
 
-        except Exception as e:
-            print(f'An exception  {e}')
-            self.output_gen(steam_items)
+            except Exception as e:
+                print(f'An exception  {e}')
+                self.output_gen(steam_items)
 
-        finally:
-            self.driver.close()
+            finally:
+                self.driver.close()
 
-        return self.data_processor.merge_steam_folio(steam_items, folio_sales_df)
+        self.driver.close()
+
+        return pd.DataFrame(steam_items)
 
 
     def output_gen(self, steam_items_df: pd.DataFrame) -> None:
