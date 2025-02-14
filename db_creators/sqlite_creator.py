@@ -39,23 +39,12 @@ class SQLiteDatabaseCreator(SQLiteDB):
 
     """Creates a sqlite db and inserts items"""
 
-    def sql_script(self) -> str:
-
-        """Returns an sql scrip, which creates a table"""
-
-        return """CREATE TABLE IF NOT EXISTS steam_items(
-            id INTEGER PRIMARY KEY,
-            name TEXT, url TEXT,
-            qty INTEGER,
-            price TEXT,
-            sales_w INTEGER,
-            sales_m INTEGER,
-            sales_y INTEGER
-            )"""
-
     def create_db(self):
         self.open_connection()
         try:
+            if 'sales_w' not in self.steam_items_df.columns: #add cols when parsed without sales
+                self.steam_items_df[['sales_w', 'sales_m', 'sales_y']] = pd.NA
+
             self.steam_items_df.to_sql(name='steam_items', con=self.conn, index=False)
 
         finally:
